@@ -1,0 +1,35 @@
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Git
+.git/
+.gitignore
+
+# Env & secrets
+.env
+*.env.local
+
+# Eval outputs
+runs/
+lm_eval_output/
+outputs/
+
+# Docs / misc
+*.md
+sheets-setup.md
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

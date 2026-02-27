@@ -2,7 +2,7 @@
 
 import { FormEvent, useRef, useState } from 'react'
 
-const SHEET_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbx28skrI1XMAX3QLox1d6EP6udjrorNHcmNe_9pOfapleQqz10waXokTiCjAa849A9V5A/exec'
 
 export function WaitlistForm() {
   const [submitted, setSubmitted] = useState(false)
@@ -34,7 +34,7 @@ export function WaitlistForm() {
     }
 
     try {
-      if (SHEET_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+      if (SHEET_URL === 'https://script.google.com/macros/s/AKfycbx28skrI1XMAX3QLox1d6EP6udjrorNHcmNe_9pOfapleQqz10waXokTiCjAa849A9V5A/exec') {
         console.log('[v8eval] Dev mode — form data:', payload)
         await new Promise((r) => setTimeout(r, 800))
       } else {

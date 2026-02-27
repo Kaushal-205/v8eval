@@ -97,6 +97,11 @@ class RunResponse(BaseModel):
 
 # ── API routes ───────────────────────────────────────────────────────────────
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.get("/api/test-sse")
 async def test_sse():
     """Minimal SSE endpoint for debugging browser EventSource."""
