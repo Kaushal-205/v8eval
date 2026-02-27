@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'v8eval — Independent AI Model Verification',
+  title: 'v8eval: Independent AI Model Verification',
   description: 'Prove your model works. Keep your weights private. Independent AI model verification inside a Trusted Execution Environment.',
 }
 

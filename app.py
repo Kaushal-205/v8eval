@@ -1,11 +1,12 @@
-"""v8eval — FastAPI backend.
+"""v8eval — FastAPI backend (API only).
 
-Serves the Next.js static export from frontend/out/ and exposes API endpoints
-for running lm-eval evaluations with SSE streaming.
+Frontend is hosted on Vercel. This service exposes the evaluation API
+and is deployed on EigenCompute TEE.
 """
 
 import asyncio
 import json
+import os
 import threading
 import uuid
 from contextlib import asynccontextmanager
@@ -15,8 +16,8 @@ from typing import AsyncGenerator
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from eval_runner import (
@@ -66,7 +67,7 @@ def _load_runs_from_disk() -> None:
             )
             runs[run_id] = state
         except Exception:
-            pass  # skip corrupt files
+            pass
 
 
 # ── Lifespan ─────────────────────────────────────────────────────────────────
@@ -80,6 +81,13 @@ async def lifespan(app: FastAPI):
 # ── App ──────────────────────────────────────────────────────────────────────
 
 app = FastAPI(title="v8eval", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("CORS_ORIGINS", "*").split(","),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # ── Request / Response models ────────────────────────────────────────────────
@@ -100,20 +108,6 @@ class RunResponse(BaseModel):
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
-
-@app.get("/api/test-sse")
-async def test_sse():
-    """Minimal SSE endpoint for debugging browser EventSource."""
-    async def generate():
-        for i in range(10):
-            yield f"data: {{\"i\": {i}}}\n\n"
-            await asyncio.sleep(1)
-    return StreamingResponse(
-        generate(),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
-    )
 
 
 @app.get("/api/models")
@@ -142,7 +136,6 @@ def list_runs():
             "duration_seconds": r.get("runtime", {}).get("duration_seconds", 0),
             "scores": r.get("scores", {}),
         })
-    # Sort newest first using timestamp string (ISO format sorts lexicographically)
     items.sort(key=lambda x: x["timestamp_utc"], reverse=True)
     return {"runs": items}
 
@@ -190,11 +183,9 @@ async def stream_logs(run_id: str):
 
         print(f"[SSE:{run_id}] Stream started, status={state.status}, logs={len(state.logs)}")
 
-        # Send an initial ping so the browser confirms the connection is live
         yield ": ping\n\n"
 
         while True:
-            # Batch all pending log lines into individual messages
             current_len = len(state.logs)
             if current_len > sent:
                 for line in state.logs[sent:current_len]:
@@ -203,7 +194,6 @@ async def stream_logs(run_id: str):
                     yield f"data: {msg}\n\n"
                 sent = current_len
 
-            # Progress update
             msg = json.dumps({
                 "t": "progress",
                 "p": round(state.progress, 2),
@@ -212,7 +202,6 @@ async def stream_logs(run_id: str):
             })
             yield f"data: {msg}\n\n"
 
-            # Terminal events
             if state.status == "completed":
                 print(f"[SSE:{run_id}] Sending done, sent={sent} logs")
                 yield f"data: {json.dumps({'t': 'done'})}\n\n"
@@ -248,41 +237,6 @@ def get_result(run_id: str):
         raise HTTPException(status_code=500, detail=state.error or "Evaluation failed.")
 
     return state.results
-
-
-# ── Static page serving ──────────────────────────────────────────────────────
-
-STATIC_DIR = Path("frontend/out")
-
-
-def _serve_page(name: str) -> HTMLResponse:
-    page = STATIC_DIR / f"{name}.html"
-    if not page.exists():
-        raise HTTPException(status_code=404, detail=f"Page not built: {name}")
-    return HTMLResponse(
-        page.read_text(encoding="utf-8"),
-        headers={"Cache-Control": "no-store"},
-    )
-
-
-@app.get("/verify")
-def verify_page():
-    return _serve_page("verify")
-
-
-@app.get("/proof")
-def proof_page_bare():
-    return _serve_page("proof")
-
-
-@app.get("/proof/{run_id}")
-def proof_page(run_id: str):
-    return _serve_page("proof")
-
-
-# ── Static file serving (Next.js assets) ─────────────────────────────────────
-
-app.mount("/", StaticFiles(directory="frontend/out", html=True), name="static")
 
 
 # ── Entrypoint ───────────────────────────────────────────────────────────────

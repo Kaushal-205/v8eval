@@ -2,7 +2,7 @@
 
 import { FormEvent, useRef, useState } from 'react'
 
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbx28skrI1XMAX3QLox1d6EP6udjrorNHcmNe_9pOfapleQqz10waXokTiCjAa849A9V5A/exec'
+const SHEET_URL = process.env.NEXT_PUBLIC_SHEET_URL || ''
 
 export function WaitlistForm() {
   const [submitted, setSubmitted] = useState(false)
@@ -34,14 +34,12 @@ export function WaitlistForm() {
     }
 
     try {
-      if (SHEET_URL === 'https://script.google.com/macros/s/AKfycbx28skrI1XMAX3QLox1d6EP6udjrorNHcmNe_9pOfapleQqz10waXokTiCjAa849A9V5A/exec') {
-        console.log('[v8eval] Dev mode — form data:', payload)
-        await new Promise((r) => setTimeout(r, 800))
+      if (!SHEET_URL) {
+        console.log('[v8eval] NEXT_PUBLIC_SHEET_URL not set - form data:', payload)
       } else {
         await fetch(SHEET_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
       }
@@ -82,7 +80,7 @@ export function WaitlistForm() {
 
               <div className="form-group">
                 <label className="form-label" htmlFor="useCase">Use case</label>
-                <textarea className="form-textarea" id="useCase" name="useCase" placeholder="Tell us how you plan to use verifiable model verification — e.g. proving performance to customers, compliance reporting, competitive differentiation..." />
+                <textarea className="form-textarea" id="useCase" name="useCase" placeholder="Tell us how you plan to use verifiable model verification, e.g. proving performance to customers, compliance reporting, competitive differentiation..." />
               </div>
 
               <div className="form-group">

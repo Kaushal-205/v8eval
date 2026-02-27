@@ -23,7 +23,7 @@ export default function HomePage() {
 
           <p className="hero-sub">
             Independent AI model verification inside a Trusted Execution Environment.
-            Your weights never leave the enclave — your results are cryptographically proven.
+            Your weights never leave the enclave. Your results are cryptographically proven.
           </p>
 
           <div className="hero-ctas">
@@ -77,7 +77,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="step-title">We run the benchmarks</h3>
                 <p className="step-desc">
-                  Your eval executes in an EigenCompute Trusted Execution Environment — hardware-isolated, tamper-proof, fully auditable.
+                  Your eval executes in an EigenCompute Trusted Execution Environment: hardware-isolated, tamper-proof, fully auditable.
                 </p>
               </div>
 
@@ -90,7 +90,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="step-title">Share your proof</h3>
                 <p className="step-desc">
-                  Receive a cryptographically signed certificate with scores, timestamps, and Docker digest. Share it — anyone can verify it on-chain.
+                  Receive a cryptographically signed certificate with scores, timestamps, and Docker digest. Share it and anyone can verify it on-chain.
                 </p>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function HomePage() {
               <p className="section-label reveal">Use cases</p>
               <h2 className="section-title reveal" id="why-title">Why it matters</h2>
               <p className="section-sub reveal">
-                Trust is infrastructure. v8eval lets AI companies prove their models work as advertised — without exposing weights.
+                Trust is infrastructure. v8eval lets AI companies prove their models work as advertised, without exposing weights.
               </p>
 
               <div className="why-grid">
@@ -135,7 +135,7 @@ export default function HomePage() {
                   </div>
                   <h3 className="why-title">Regulatory compliance</h3>
                   <p className="why-desc">
-                    As AI regulation tightens globally, verifiable audit trails become a compliance requirement — not just a nice-to-have.
+                    As AI regulation tightens globally, verifiable audit trails become a compliance requirement, not just a nice-to-have.
                   </p>
                 </div>
 
@@ -148,7 +148,7 @@ export default function HomePage() {
                   </div>
                   <h3 className="why-title">Competitive differentiation</h3>
                   <p className="why-desc">
-                    Stand out with independently verified performance. Give investors and customers a verified, on-chain record they can trust — not a slide deck.
+                    Stand out with independently verified performance. Give investors and customers a verified, on-chain record they can trust, not a slide deck.
                   </p>
                 </div>
               </div>
