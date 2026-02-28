@@ -2,8 +2,6 @@
 
 import { FormEvent, useRef, useState } from 'react'
 
-const SHEET_URL = process.env.NEXT_PUBLIC_SHEET_URL || ''
-
 export function WaitlistForm() {
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
@@ -34,15 +32,12 @@ export function WaitlistForm() {
     }
 
     try {
-      if (!SHEET_URL) {
-        console.log('[v8eval] NEXT_PUBLIC_SHEET_URL not set - form data:', payload)
-      } else {
-        await fetch(SHEET_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: JSON.stringify(payload),
-        })
-      }
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error('Failed')
       setSubmitted(true)
     } catch {
       setError('Something went wrong. Please try again.')

@@ -1,19 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Static export for EigenCompute Docker build.
-  // On Vercel, STATIC_EXPORT is unset so Next.js runs in server mode with rewrites.
-  ...(process.env.STATIC_EXPORT === 'true' ? { output: 'export', trailingSlash: false } : {}),
-
-  // Rewrites proxy /api/* to the FastAPI backend.
-  // - Local dev:        BACKEND_URL=http://localhost:8000
-  // - Vercel:           BACKEND_URL=http://34.73.123.230  (set in Vercel env vars)
-  // - Docker/EigenCompute: static export, rewrites ignored (same-origin)
+  // Rewrites proxy backend API calls to the FastAPI server on EigenCompute.
+  // /api/waitlist is handled by Next.js API route (not proxied).
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
     return [
       {
-        source: '/api/:path*',
-        destination: `${backendUrl}/api/:path*`,
+        source: '/api/models',
+        destination: `${backendUrl}/api/models`,
+      },
+      {
+        source: '/api/runs',
+        destination: `${backendUrl}/api/runs`,
+      },
+      {
+        source: '/api/run',
+        destination: `${backendUrl}/api/run`,
+      },
+      {
+        source: '/api/stream/:path*',
+        destination: `${backendUrl}/api/stream/:path*`,
+      },
+      {
+        source: '/api/result/:path*',
+        destination: `${backendUrl}/api/result/:path*`,
       },
     ]
   },
